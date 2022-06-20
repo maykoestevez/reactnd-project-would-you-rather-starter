@@ -1,6 +1,6 @@
 import { Component } from "react";
 import Login from "./components/Login";
-import { Link, Route, Routes, useParams } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import Home from "./components/Home";
 import { Content, Header } from "antd/lib/layout/layout";
 import { Avatar, Col, Layout, Menu, Row } from "antd";
@@ -18,7 +18,7 @@ class App extends Component {
 
   render() {
 
-    const navigateToComponent = (component) => currentUser.id ? component : <Login />
+    const navigateToComponent = (component) => currentUser.id ? component :  <Navigate to="/" replace />
     const { currentUser } = this.props;
     const logout = () => {
       this.props.dispatch(setAuthedUser({ id: undefined, name: '' }));
