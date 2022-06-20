@@ -1,6 +1,9 @@
+import { _getQuestions, _saveQuestion, _saveQuestionAnswer } from "../_DATA"
+import { saveQuestionUser } from "./users"
+
 export const FETCH_QUESTIONS = 'FETCH_QUESTIONS'
 export const SAVE_QUESTION = 'SAVE_QUESTION'
-export const SAVE_QUESTION_ANSWER = 'SAVE_QUESTION_ANSWER'
+export const UPDATE_VOTES = 'UPDATE_VOTES'
 
 export function saveQuestion(question) {
     return {
@@ -9,13 +12,12 @@ export function saveQuestion(question) {
     }
 }
 
-export function saveQuestionAnswer(questionAnswer) {
+export function updateVotes(questionAnswer) {
     return {
-        type: SAVE_QUESTION,
+        type: UPDATE_VOTES,
         questionAnswer
     }
 }
-
 
 export function fetchQuestions(questions) {
     return {
@@ -23,3 +25,19 @@ export function fetchQuestions(questions) {
         questions
     }
 }
+
+export function handleQuestions() {
+    return (dispatch) => {
+        return _getQuestions().then((questions) => dispatch(fetchQuestions(questions)))
+    }
+}
+
+export function handleSaveQuestion(question) {
+    return (dispatch) => {
+        return _saveQuestion(question).then((questionResult) => {
+            dispatch(saveQuestion(questionResult));
+            dispatch(saveQuestionUser(questionResult));
+        })
+    }
+}
+

@@ -1,4 +1,4 @@
-import { FETCH_QUESTIONS, SAVE_QUESTION} from "../actions/questions";
+import { FETCH_QUESTIONS, SAVE_QUESTION, UPDATE_VOTES } from "../actions/questions";
 
 export default function questions(state = {}, action) {
     switch (action.type) {
@@ -10,9 +10,21 @@ export default function questions(state = {}, action) {
         case SAVE_QUESTION:
             return {
                 ...state,
-                [action.id]: action.question
+                [action.question.id]: action.question
             }
-        default:
-            break;
+
+        case UPDATE_VOTES:
+            const { qid, answer, authedUser } = action.questionAnswer
+            return {
+                ...state,
+                [qid]: {
+                    ...state[qid],
+                    [answer]: {
+                        ...state[qid][answer],
+                        votes: state[qid][answer].votes.concat([authedUser])
+                    }
+                }
+            }
+        default: return state
     }
 }

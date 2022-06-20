@@ -1,58 +1,85 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { Component } from "react";
+import Login from "./components/Login";
+import { Link, Route, Routes } from 'react-router-dom';
+import Home from "./components/Home";
+import { Content, Header } from "antd/lib/layout/layout";
+import { Avatar, Col, Layout, Menu, Row } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import { connect } from "react-redux";
+import { setAuthedUser } from "./actions/authedUser";
+import { withRouter } from "./components/WithRouter";
+import NewQuestion from "./components/NewQuestion";
+import LeaderBoard from "./components/LeaderBoard";
+import QuestionSelection from "./components/QuestionSelection";
+import QuestionResult from "./components/QuestionResults";
+import NotFoundPage from "./components/NotFoundPage";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
-  );
+class App extends Component {
+  render() {
+
+    const navigateToComponent = (component) => currentUser ? component : <Login />
+    const { currentUser } = this.props;
+    const logout = () => {
+      this.props.dispatch(setAuthedUser({ id: undefined, name: '' }));
+      this.props.navigate('/');
+    }
+
+    const showNavigate = (route) =>
+      currentUser ? <Link to={route}></Link> : <Link to={'/'}></Link>
+
+    return (
+      <div>
+        <Layout>
+          <Header>
+            <Row justify="space-between">
+              <Col span={12}>
+                <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['home']} >
+                  <Menu.Item key="home" >
+                    <span>Home</span>
+                    {showNavigate("/home")}
+                  </Menu.Item>
+                  <Menu.Item key="newQuestion"  >
+                    <span>New Question</span>
+                    {showNavigate("/add")}
+                  </Menu.Item>
+                  <Menu.Item key="leaderBoard"  >
+                    <span> Leader Board</span>
+                    {showNavigate("/leaderBoard")}
+                  </Menu.Item>
+                </Menu>
+              </Col>
+              <Col span={4}>
+                {currentUser.id &&
+                  <div>
+                    <label style={{ color: "white", padding: "8px" }}>{currentUser.name}</label>
+                    <Avatar src={currentUser?.avatarURL && ''} />
+                    <label onClick={logout} style={{ cursor: 'pointer', color: "white", paddingLeft: "40px" }}>Log out</label>
+                  </div>
+                }
+              </Col>
+            </Row>
+          </Header>
+          <Content style={{ padding: '0 50px', minHeight: 400 }}>
+            <Routes>
+              <Route path='*' element={<NotFoundPage />} />
+              <Route path='/' element={<Login />} />
+              <Route path='/home' element={navigateToComponent(<Home />)} />
+              <Route path='/add' element={navigateToComponent(<NewQuestion />)} />
+              <Route path='/leaderBoard' element={navigateToComponent(<LeaderBoard />)} />
+              <Route path='/questions/:id' element={navigateToComponent(<QuestionSelection />)} />
+              <Route path='/questionResult/:id' element={navigateToComponent(<QuestionResult />)} />
+            </Routes>
+          </Content>
+        </Layout>
+      </div>
+    )
+  }
 }
 
-export default App;
+function mapStateToProps({ authedUser }) {
+  return {
+    currentUser: authedUser
+  }
+}
+
+export default withRouter(connect(mapStateToProps)(App))
