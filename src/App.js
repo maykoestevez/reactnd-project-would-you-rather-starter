@@ -1,6 +1,6 @@
 import { Component } from "react";
 import Login from "./components/Login";
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useParams } from 'react-router-dom';
 import Home from "./components/Home";
 import { Content, Header } from "antd/lib/layout/layout";
 import { Avatar, Col, Layout, Menu, Row } from "antd";
@@ -15,9 +15,10 @@ import QuestionResult from "./components/QuestionResults";
 import NotFoundPage from "./components/NotFoundPage";
 
 class App extends Component {
+
   render() {
 
-    const navigateToComponent = (component) => currentUser ? component : <Login />
+    const navigateToComponent = (component) => currentUser.id ? component : <Login />
     const { currentUser } = this.props;
     const logout = () => {
       this.props.dispatch(setAuthedUser({ id: undefined, name: '' }));
@@ -62,12 +63,12 @@ class App extends Component {
           <Content style={{ padding: '0 50px', minHeight: 400 }}>
             <Routes>
               <Route path='*' element={<NotFoundPage />} />
+              <Route path="notFound" element={<NotFoundPage />} />
               <Route path='/' element={<Login />} />
               <Route path='/home' element={navigateToComponent(<Home />)} />
               <Route path='/add' element={navigateToComponent(<NewQuestion />)} />
               <Route path='/leaderBoard' element={navigateToComponent(<LeaderBoard />)} />
-              <Route path='/questions/:id' element={navigateToComponent(<QuestionSelection />)} />
-              <Route path='/questionResult/:id' element={navigateToComponent(<QuestionResult />)} />
+              <Route path='/questions/:question_id' element={navigateToComponent(<QuestionSelection />)} />
             </Routes>
           </Content>
         </Layout>
@@ -76,10 +77,11 @@ class App extends Component {
   }
 }
 
-function mapStateToProps({ authedUser }) {
+function MapStateToProps({ authedUser, questions }) {
   return {
-    currentUser: authedUser
+    currentUser: authedUser,
+    questions
   }
 }
 
-export default withRouter(connect(mapStateToProps)(App))
+export default connect(MapStateToProps)(withRouter(App))

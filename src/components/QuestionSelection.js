@@ -5,11 +5,26 @@ import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import { withRouter } from "./WithRouter";
 import { handleSaveQuestionAnswer } from "../actions/users";
+import QuestionResult from "./QuestionResults";
 
 class QuestionSelection extends Component {
 
     state = {
-        selectedOption: 'optionOne'
+        selectedOption: 'optionOne',
+        redirectToResult: false
+    }
+    isQuestionAnswered = () => {
+        const { question, authedUser } = this.props
+        const isAnswered = question?.optionOne.votes.some(u => authedUser.id === u) ||
+            question?.optionTwo.votes.some(u => authedUser.id === u)
+        this.setState(() => ({ redirectToResult: isAnswered }))
+    }
+    componentDidMount() {
+        this.isQuestionAnswered();
+        if (!this.props.question)
+        {
+            this.props.navigate('/notFound')
+        }
     }
     saveAnswer(question) {
         this.props.dispatch(handleSaveQuestionAnswer({
@@ -17,7 +32,7 @@ class QuestionSelection extends Component {
             authedUser: this.props.authedUser.id,
             answer: this.state.selectedOption
         }));
-        this.props.navigate(`/questionResult/${question.id}`)
+        this.setState(() => ({ redirectToResult: true }))
     }
 
     onChange = (e) => this.setState(() => ({ selectedOption: e.target.value }));
@@ -25,27 +40,33 @@ class QuestionSelection extends Component {
     render() {
         const { question, authedUser } = this.props;
         return (
+
             <div>
-                <Card title={`${question?.author} asks:`}>
-                    <div>
-                        <Avatar src={authedUser.avatarURL} size={'large'} />
-                        <p></p>
-                        <h3>Would you rather...</h3>
-                        <Radio.Group onChange={this.onChange} name="radiogroup" defaultValue={'optionOne'}>
-                            <Radio value={'optionOne'}>{question?.optionOne.text}</Radio>
-                            <Radio value={'optionTwo'}>{question?.optionTwo.text}</Radio>
-                        </Radio.Group>
-                        <p></p>
-                        <Button onClick={() => this.saveAnswer(question)}>Submit</Button>
-                    </div>
-                </Card>
+                {
+                    this.state.redirectToResult ?
+                        <QuestionResult question_id={question.id} />
+                        : <Card title={`${question?.author} asks:`}>
+                            <div>
+                                <Avatar src={authedUser.avatarURL} size={'large'} />
+                                <p></p>
+                                <h3>Would you rather...</h3>
+                                <Radio.Group onChange={this.onChange} name="radiogroup" defaultValue={'optionOne'}>
+                                    <Radio value={'optionOne'}>{question?.optionOne.text}</Radio>
+                                    <Radio value={'optionTwo'}>{question?.optionTwo.text}</Radio>
+                                </Radio.Group>
+                                <p></p>
+                                <Button onClick={() => this.saveAnswer(question)}>Submit</Button>
+                            </div>
+                        </Card>
+                }
+
             </div>
         )
     }
 }
 function MapStateToProps({ questions, authedUser }) {
-    const { id } = useParams()
-    const question = questions[id];
+    const { question_id } = useParams()
+    const question = questions[question_id];
 
     return {
         question,

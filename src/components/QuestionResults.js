@@ -1,16 +1,14 @@
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import QuestionResultCard from "./QuestionResultCard";
 
-export default function QuestionResult() {
-    const { id } = useParams()
+export default function QuestionResult({question_id}) {
     const {
         questions,
         users,
         authedUser
     } = useSelector((state) => state)
 
-    const question = questions[id]
+    const question = questions[question_id]
     const optionOne = question.optionOne;
     const optionTwo = question.optionTwo
     const authedUserId = authedUser.id

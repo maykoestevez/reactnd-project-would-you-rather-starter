@@ -7,19 +7,21 @@ import { withRouter } from "./WithRouter";
 class NewQuestion extends Component {
 
     state = {
-        optionOne: '',
-        optionTwo: ''
+        optionOne: "",
+        optionTwo: "",
+        submitDisabled: true
     }
 
     onChangeOptionOne = (e) => {
         const optionOne = e.target.value;
-        this.setState(() => ({ optionOne: optionOne }))
-
+        const isDisabled = optionOne === "" || this.state.optionTwo === "";
+        this.setState(() => ({ optionOne: optionOne, submitDisabled: isDisabled }))
     }
 
     onChangeOptionTwo = (e) => {
         const optionTwo = e.target.value;
-        this.setState(() => ({ optionTwo: optionTwo }))
+        const isDisabled = optionTwo === "" || this.state.optionOne === "";
+        this.setState(() => ({ optionTwo: optionTwo, submitDisabled: isDisabled }))
     }
     add = () => {
         const { optionOne, optionTwo } = this.state;
@@ -32,9 +34,11 @@ class NewQuestion extends Component {
         this.props.navigate('/home')
     }
 
-    render() {
 
+    render() {
+        const { optionOne, optionTwo } = this.state;
         return (
+
             <div>
                 <Card title="Create New Question">
                     <div>
@@ -44,7 +48,7 @@ class NewQuestion extends Component {
                         <p></p>
                         <input onChange={this.onChangeOptionTwo} placeholder="Enter option two"></input>
                         <p></p>
-                        <Button onClick={() => this.add()}>Submit</Button>
+                        <Button disabled={this.state.submitDisabled} onClick={() => this.add()}>Submit</Button>
                     </div>
                 </Card>
             </div>
