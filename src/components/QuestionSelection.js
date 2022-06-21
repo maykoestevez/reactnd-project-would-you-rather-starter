@@ -21,10 +21,6 @@ class QuestionSelection extends Component {
     }
     componentDidMount() {
         this.isQuestionAnswered();
-        if (!this.props.question)
-        {
-            this.props.navigate('/notFound')
-        }
     }
     saveAnswer(question) {
         this.props.dispatch(handleSaveQuestionAnswer({
