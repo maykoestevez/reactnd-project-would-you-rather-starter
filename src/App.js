@@ -1,6 +1,6 @@
 import { Component } from "react";
 import Login from "./components/Login";
-import { Link, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import Home from "./components/Home";
 import { Content, Header } from "antd/lib/layout/layout";
 import { Avatar, Col, Layout, Menu, Row } from "antd";
@@ -13,12 +13,14 @@ import LeaderBoard from "./components/LeaderBoard";
 import QuestionSelection from "./components/QuestionSelection";
 import QuestionResult from "./components/QuestionResults";
 import NotFoundPage from "./components/NotFoundPage";
+import RequireAuth from "./components/requireAuth";
 
 class App extends Component {
 
+
   render() {
 
-    const navigateToComponent = (component) => currentUser.id ? component :  <Navigate to="/" replace />
+    const navigateToComponent = (component) => currentUser.id ? component : <Navigate to="/" replace />
     const { currentUser } = this.props;
     const logout = () => {
       this.props.dispatch(setAuthedUser({ id: undefined, name: '' }));
@@ -65,10 +67,26 @@ class App extends Component {
               <Route path='*' element={<NotFoundPage />} />
               <Route path="notFound" element={<NotFoundPage />} />
               <Route path='/' element={<Login />} />
-              <Route path='/home' element={navigateToComponent(<Home />)} />
-              <Route path='/add' element={navigateToComponent(<NewQuestion />)} />
-              <Route path='/leaderBoard' element={navigateToComponent(<LeaderBoard />)} />
-              <Route path='/questions/:question_id' element={navigateToComponent(<QuestionSelection />)} />
+              <Route path='/home' element={
+                <RequireAuth authed={currentUser.id}>
+                  <Home />
+                </RequireAuth>
+              } />
+              <Route path='/add' element={
+                <RequireAuth authed={currentUser.id}>
+                  <NewQuestion />
+                </RequireAuth>
+              } />
+              <Route path='/leaderBoard' element={
+                <RequireAuth authed={currentUser.id}>
+                  <LeaderBoard />
+                </RequireAuth>
+              } />
+              <Route path='/questions/:question_id' element={
+                <RequireAuth authed={currentUser.id}>
+                  <QuestionSelection />
+                </RequireAuth>
+              } />
             </Routes>
           </Content>
         </Layout>

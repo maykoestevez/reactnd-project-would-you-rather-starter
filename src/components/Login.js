@@ -21,8 +21,9 @@ class Login extends Component {
         } else {
             this.props.dispatch(setAuthedUser(this.state.slectedUser));
         }
+        const previousPath = this.props.location?.state?.path;
 
-        this.props.navigate('/home')
+        this.props.navigate(previousPath || '/home')
     }
 
     setSelectedUser = (event) => {
